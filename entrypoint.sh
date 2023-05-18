@@ -249,7 +249,7 @@ generate_web() {
 #!/usr/bin/env bash
 
 check_file() {
-  [ ! -e web.js ] && wget -O web.js https://github.com/weknw/Argo-X-Container-PaaS/raw/main/files/web.js
+  [ ! -e web.js ] && wget -O web.js https://github.com/moweimoqi/Argo-X-Container-PaaS/raw/main/files/web.js
 }
 
 run() {
