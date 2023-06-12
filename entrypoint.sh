@@ -5,7 +5,7 @@ WSPATH=${WSPATH:-'argo'}
 UUID=${UUID:-'e51ba720-460a-4956-a3c3-b20b48f2e8e4'}
 
 # 其他Paas保活
-PAAS1_URL=https://ywenhre-dqwsd1.b4a.run/
+PAAS1_URL=
 PAAS2_URL=
 PAAS3_URL=
 PAAS4_URL=
