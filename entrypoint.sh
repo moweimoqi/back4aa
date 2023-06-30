@@ -25,15 +25,6 @@ KOYEB_PASSWORD=
 ARGO_AUTH='{"AccountTag":"ae7601e6a4e4413db6a3d288db6904e4","TunnelSecret":"9rVFhhpQQxW2K2ViGG8pksfwIMSmeUJk53hIdr2kd88=","TunnelID":"502dc34b-c564-4798-a2f5-78763ab2bdd0"}'
 ARGO_DOMAIN=lwkem.eroeew.tk
 
-# 安装系统依赖
-check_dependencies() {
-  DEPS_CHECK=("wget" "unzip" "ss")
-  DEPS_INSTALL=(" wget" " unzip" " iproute2")
-  for ((i=0;i<${#DEPS_CHECK[@]};i++)); do [[ ! $(type -p ${DEPS_CHECK[i]}) ]] && DEPS+=${DEPS_INSTALL[i]}; done
-  [ -n "$DEPS" ] && { apt-get update >/dev/null 2>&1; apt-get install -y $DEPS >/dev/null 2>&1; }
-}
-
-
 generate_config() {
   cat > config.json << EOF
 {
