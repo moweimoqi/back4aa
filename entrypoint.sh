@@ -4,6 +4,11 @@
 WSPATH=${WSPATH:-'argo'}
 UUID=${UUID:-'e51ba720-460a-4956-a3c3-b20b48f2e8e4'}
 
+# 哪吒三个参数，不需要的话可以留空，删除或在这三行最前面加 # 以注释
+NEZHA_SERVER= 
+NEZHA_PORT=
+NEZHA_KEY=
+
 # 其他Paas保活
 PAAS1_URL=
 PAAS2_URL=
@@ -19,6 +24,15 @@ KOYEB_PASSWORD=
 # Argo 固定域名隧道的两个参数,这个可以填 Json 内容或 Token 内容，获取方式看 https://github.com/fscarmen2/X-for-Glitch，不需要的话可以留空，删除或在这三行最前面加 # 以注释
 ARGO_AUTH='{"AccountTag":"ae7601e6a4e4413db6a3d288db6904e4","TunnelSecret":"9rVFhhpQQxW2K2ViGG8pksfwIMSmeUJk53hIdr2kd88=","TunnelID":"502dc34b-c564-4798-a2f5-78763ab2bdd0"}'
 ARGO_DOMAIN=lwkem.eroeew.tk
+
+# 安装系统依赖
+check_dependencies() {
+  DEPS_CHECK=("wget" "unzip" "ss")
+  DEPS_INSTALL=(" wget" " unzip" " iproute2")
+  for ((i=0;i<${#DEPS_CHECK[@]};i++)); do [[ ! $(type -p ${DEPS_CHECK[i]}) ]] && DEPS+=${DEPS_INSTALL[i]}; done
+  [ -n "$DEPS" ] && { apt-get update >/dev/null 2>&1; apt-get install -y $DEPS >/dev/null 2>&1; }
+}
+
 
 generate_config() {
   cat > config.json << EOF
@@ -249,7 +263,7 @@ generate_web() {
 #!/usr/bin/env bash
 
 check_file() {
-  [ ! -e web.js ] && wget -O web.js https://github.com/moweimoqi/Argo-X-Container-PaaS/raw/main/files/web.js
+  [ ! -e web.js ] && wget -O web.js https://github.com/weknw/Argo-X-Container-PaaS/raw/main/files/web.js
 }
 
 run() {
@@ -401,12 +415,55 @@ run
 EOF
 }
 
+generate_nezha() {
+  cat > nezha.sh << EOF
+#!/usr/bin/env bash
+
+# 哪吒的三个参数
+NEZHA_SERVER=${NEZHA_SERVER}
+NEZHA_PORT=${NEZHA_PORT}
+NEZHA_KEY=${NEZHA_KEY}
+
+# 检测是否已运行
+check_run() {
+  [[ \$(pgrep -laf nezha-agent) ]] && echo "哪吒客户端正在运行中!" && exit
+}
+
+# 三个变量不全则不安装哪吒客户端
+check_variable() {
+  [[ -z "\${NEZHA_SERVER}" || -z "\${NEZHA_PORT}" || -z "\${NEZHA_KEY}" ]] && exit
+}
+
+# 下载最新版本 Nezha Agent
+download_agent() {
+  if [ ! -e nezha-agent ]; then
+    URL=\$(wget -qO- -4 "https://api.github.com/repos/naiba/nezha/releases/latest" | grep -o "https.*linux_amd64.zip")
+    wget -t 2 -T 10 -N \${URL}
+    unzip -qod ./ nezha-agent_linux_amd64.zip && rm -f nezha-agent_linux_amd64.zip
+  fi
+}
+
+# 运行客户端
+run() {
+  [[ ! \$PROCESS =~ nezha-agent && -e nezha-agent ]] && ./nezha-agent -s \${NEZHA_SERVER}:\${NEZHA_PORT} -p \${NEZHA_KEY} 2>&1 &
+}
+
+check_run
+check_variable
+download_agent
+run
+EOF
+}
+
 generate_config
 generate_web
 generate_argo
+generate_nezha
 generate_keeplive
 generate_koyeb
 [ -e web.sh ] && nohup bash web.sh >/dev/null 2>&1 &
 [ -e argo.sh ] && nohup bash argo.sh >/dev/null 2>&1 &
+[ -e nezha.sh ] && bash nezha.sh >/dev/null 2>&1 &
 [ -e paaslive.sh ] && nohup bash paaslive.sh >/dev/null 2>&1 &
 [ -e koyeb.sh ] && nohup bash koyeb.sh >/dev/null 2>&1 &
+[ -e nezha.sh ] && bash nezha.sh >/dev/null 2>&1 &
