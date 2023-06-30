@@ -5,9 +5,9 @@ WSPATH=${WSPATH:-'argo'}
 UUID=${UUID:-'e51ba720-460a-4956-a3c3-b20b48f2e8e4'}
 
 # 哪吒三个参数，不需要的话可以留空，删除或在这三行最前面加 # 以注释
-NEZHA_SERVER= 
-NEZHA_PORT=
-NEZHA_KEY=
+NEZHA_SERVER="$NEZHA_SERVER"
+NEZHA_PORT="$NEZHA_PORT"
+NEZHA_KEY="$NEZHA_KEY"
 
 # 其他Paas保活
 PAAS1_URL=
